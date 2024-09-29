@@ -1,0 +1,11 @@
+[mysql]
+host = <IP>
+port = <PORTA>
+user = <USERNAME>
+password = <PASSWORD>
+
+[mysqldump]
+host = <IP>
+port = <PORTA>
+user = <USERNAME>
+password = <PASSWORD>
