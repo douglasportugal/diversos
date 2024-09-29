@@ -1,0 +1,1 @@
+Conecta à API do Proxmox criando 3 máquinas virtuais a partir de um template já construído.
