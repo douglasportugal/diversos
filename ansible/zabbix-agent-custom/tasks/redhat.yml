@@ -1,0 +1,21 @@
+---
+- name: Install packages
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop:
+    - tar
+    - cpio
+
+- name: Set fact redhat like package
+  ansible.builtin.set_fact: 
+    url_custom_redhat: "https://repo.zabbix.com/zabbix/{{ zabbix_major_version }}/rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/zabbix-agent2-{{ zabbix_major_version }}.{{ zabbix_minor_version }}-release1.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}.rpm"
+
+- name: Download temp file redhat like package
+  ansible.builtin.get_url:
+    url: https://repo.zabbix.com/zabbix/{{ zabbix_major_version }}/rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/zabbix-agent2-{{ zabbix_major_version }}.{{ zabbix_minor_version }}-release1.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}.rpm
+    dest: "{{ temp_dir }}"
+
+- name: Extract .rpm
+  ansible.builtin.shell: cd "{{ temp_dir }}";rpm2cpio zabbix-agent2-{{ zabbix_major_version }}.{{ zabbix_minor_version }}-release1.el{{ ansible_distribution_major_version }}.{{ ansible_architecture }}.rpm | cpio -i --make-directories

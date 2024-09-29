@@ -1,0 +1,21 @@
+---
+- name: Check if SELinux is installed (check for the presence of sestatus)
+  command: sestatus
+  register: selinux_check
+  ignore_errors: true
+
+- name: Create firewall rule for port 10055 if SELinux is present
+  ansible.builtin.firewalld:
+    port: 10055/tcp
+    permanent: yes
+    state: enabled
+  when: selinux_check.rc == 0
+  notify:
+    - Reload firewalld
+
+- name: Add SELinux rule for Zabbix Agent to use port 10055
+  command: semanage port -a -t zabbix_port_t -p tcp 10055
+  when: selinux_check.rc == 0
+  ignore_errors: true
+  notify:
+    - Reload SELinux

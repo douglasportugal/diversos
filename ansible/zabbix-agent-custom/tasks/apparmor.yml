@@ -1,0 +1,14 @@
+---
+- name: Check if AppArmor is installed and enabled
+  command: aa-status
+  register: apparmor_status
+  ignore_errors: true
+
+- name: Create firewall rule for port 10055 if AppArmor is enabled
+  ansible.builtin.ufw:
+    rule: allow
+    port: 10055
+    proto: tcp
+  when: apparmor_status.rc == 0
+  notify:
+    - Reload UFW

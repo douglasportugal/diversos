@@ -1,0 +1,11 @@
+---
+- name: Insert a rule on line 1
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ agent_zabbix_port }}"
+    jump: ACCEPT
+    action: insert
+    comment: "Zabbix Agent Custom"
+    rule_num: 1
+  ignore_errors: True

@@ -1,0 +1,13 @@
+---
+- name: Reload UFW
+  ansible.builtin.ufw:
+    state: reloaded
+
+- name: Reload firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    state: reloaded
+
+- name: Reload SELinux
+  ansible.builtin.command:
+    cmd: "load_policy"

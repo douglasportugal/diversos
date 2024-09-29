@@ -1,0 +1,35 @@
+---
+- name: Create Temp path 
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ temp_dir }}"
+
+- name: Ubuntu
+  include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Pop!_OS"
+
+- name: Debian
+  include_tasks: debian.yml
+  when: ansible_distribution == "Debian"
+
+- name: Redhat
+  include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Zabbix Configure
+  include_tasks: zabbix-conf.yml
+
+- name: AppArmor
+  include_tasks: apparmor.yml
+  when: ansible_os_family == "Debian"
+
+- name: Selinux and Firewalld
+  include_tasks: selinuxandfirewalld.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Firewall
+  include_tasks: firewall.yml
+  when: ansible_os_family != "RedHat" or ansible_distribution != "Debian" or ansible_distribution != "Ubuntu" or ansible_distribution != "Pop!_OS"
+

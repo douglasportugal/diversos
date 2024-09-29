@@ -1,0 +1,87 @@
+---
+- name: Check "zabbix_agent2_custom" service exits
+  ansible.builtin.command: systemctl status zabbix_agent2_custom.service
+  register: zabbix_service_status
+  ignore_errors: True
+  changed_when: False
+
+- name: Stop service "zabbix_agent2_custom" before backup
+  ansible.builtin.systemd:
+    name: zabbix_agent2_custom.service
+    state: stopped
+  when: zabbix_service_status.rc == 0
+  
+- name: Copy backup
+  ansible.builtin.copy:
+    src: "{{ agent_zabbix_dir }}"
+    dest: "{{ backup_dir }}/zabbix_{{ ansible_date_time.date }}"
+    remote_src: yes
+
+- name: Create system user
+  ansible.builtin.user:
+    name: "zabbix"
+    system: true
+    shell: /bin/false
+    state: present
+
+- name: Create paths
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+    recurse: yes
+    owner: zabbix
+    group: zabbix
+  loop:
+      - "{{ agent_zabbix_dir }}"
+      - "{{ agent_zabbix_dir_confd }}"
+      - "{{ agent_zabbix_dir_scripts }}"
+      - "{{ agent_zabbix_dir_agent2d }}"
+      - "{{ agent_zabbix_dir_pluginsd }}"
+      - "{{ agent_zabbix_pid_dir }}"
+      - "{{ agent_zabbix_log_dir }}"
+
+- name: Copy archives
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    remote_src: "{{ item.remote_src | default('no') }}"
+  loop:
+    - { src: "{{ temp_dir }}/usr/sbin/zabbix_agent2", dst: "{{ agent_zabbix_dir }}/zabbix_agent2", remote_src: 'yes' }
+    - { src: "zabbix_agent2_custom.psk", dst: "{{ agent_zabbix_dir_confd }}" }
+    - { src: "postgresql.conf", dst: "{{ agent_zabbix_dir_pluginsd }}" }
+    - { src: "zabbix-agent2-plugin-postgresql", dst: "{{ agent_zabbix_dir_pluginsd }}" }
+    - { src: "UserParameter_Cifs.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
+    - { src: "UserParameter_Mtr.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
+    - { src: "check_cifs.sh", dst: "{{ agent_zabbix_dir_scripts }}" }
+    - { src: "zabbix_agent2_custom.service", dst: "/usr/lib/systemd/system/" }
+
+- name: Copy templates
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "agent2.j2", dst: "{{ agent_zabbix_dir_confd }}zabbix_agent2_custom.conf" }
+
+- name: Systemd reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Permission on zabbix {{ agent_zabbix_dir }}
+  ansible.builtin.file:
+    path: "{{ agent_zabbix_dir }}"
+    state: directory
+    mode: '0777'
+    recurse: yes
+    owner: zabbix
+    group: zabbix
+
+- name: restarted zabbix_agent2_custom
+  ansible.builtin.systemd:
+    name: zabbix_agent2_custom.service
+    state: restarted
+    enabled: yes
+
+# Temporarily unusable for Zabbix 7 LTS; works fine in Zabbix 6.0 LTS. 
+# - name: Api
+#   include_tasks: api.yml

@@ -1,0 +1,12 @@
+---
+- name: Set fact debian like package
+  set_fact: 
+    url_custom_debian: "https://repo.zabbix.com/zabbix/{{ zabbix_major_version }}/debian/pool/main/z/zabbix/zabbix-agent2_{{ zabbix_major_version }}.{{ zabbix_minor_version }}-1%2Bdebian{{ ansible_distribution_major_version }}_amd64.deb"
+
+- name: Download temp file
+  get_url:
+    url: "{{ url_custom_debian }}"
+    dest: "{{ temp_dir }}"
+
+- name: Extract .deb debian
+  shell: cd {{ temp_dir }};/usr/bin/dpkg -x zabbix-agent2_{{ zabbix_major_version }}.{{ zabbix_minor_version }}-1%2Bdebian{{ ansible_distribution_major_version }}_amd64.deb .;

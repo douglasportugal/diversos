@@ -1,0 +1,17 @@
+PidFile=/opt/zabbix/pid/zabbix_agent2_custom.pid
+LogFile={{ agent_zabbix_log_dir }}zabbix_agent2_custom.log
+LogFileSize=1
+ListenPort={{ agent_zabbix_port }}
+Server={{ agent_zabbix_servers }}
+ServerActive={{ agent_zabbix_servers }}
+Hostname={{ ansible_hostname }}
+Include=/opt/zabbix/zabbix_agent2.d/userparameters/*.conf
+Include=/opt/zabbix/zabbix_agent2.d/plugins.d/*.conf
+ControlSocket=/tmp/agent.sock
+TLSConnect=psk
+TLSAccept=psk
+TLSPSKIdentity={{ ansible_hostname }}
+TLSPSKFile={{ agent_zabbix_dir_confd }}zabbix_agent2_custom.psk
+ListenIP={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+Timeout=30
+DebugLevel=3

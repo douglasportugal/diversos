@@ -1,0 +1,15 @@
+---
+temp_dir: "/tmp/zabbix"
+agent_zabbix_dir: "/opt/zabbix/"
+agent_zabbix_dir_confd: "/opt/zabbix/conf.d/"
+agent_zabbix_dir_agent2d: "/opt/zabbix/zabbix_agent2.d/userparameters/"
+agent_zabbix_dir_pluginsd: "/opt/zabbix/zabbix_agent2.d/plugins.d/"
+agent_zabbix_dir_scripts: "/opt/zabbix/scripts"
+agent_zabbix_log_dir: "/opt/zabbix/log/"
+agent_zabbix_pid_dir: "/opt/zabbix/pid/"
+agent_zabbix_port: "10055"
+agent_zabbix_servers: "192.168.0.216,192.168.0.217"
+agent_zabbix_servers_active: "192.168.0.216,192.168.0.217,127.0.0.1"
+zabbix_major_version: "7.0"
+zabbix_minor_version: "2"
+backup_dir: /backup_zabbix
