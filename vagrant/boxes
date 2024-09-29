@@ -1,0 +1,28 @@
+### Algumas boxes que ultilizo no meu homelab
+
+# RHEL 5
+carlba/rhel-5.8
+# RHEL 6
+generic/rhel6
+# RHEL 7
+generic/rhel7
+# RHEL 8
+generic/rhel8
+# RHEL 9
+generic/rhel9
+# Rocky Linux 8
+generic/rocky8
+# Rocky Linux 9
+generic/rocky9
+# Ubuntu 16.04
+generic/ubuntu1604
+# Ubuntu 18.04
+generic/ubuntu1804
+# Ubuntu 20.04
+generic/ubuntu2004
+# Ubuntu 22.04
+generic/ubuntu2204
+# db2
+steodorani/db2-oracle8
+# oracle
+ElfoLiNk/oracle-19c
