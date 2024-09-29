@@ -1,6 +1,6 @@
 variable "vm_names" {
   type = list(string)
-  default = ["master01","worker01","worker02"]
+  default = ["node01","node02","node03"]
 }
 
 variable "vm_networks" {
