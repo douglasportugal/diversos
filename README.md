@@ -1,1 +1,1 @@
-# "Este repositório contém uma variedade de códigos."
+# Este repositório contém uma variedade de códigos.
