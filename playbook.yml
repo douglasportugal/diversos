@@ -1,6 +1,0 @@
----
-- name: Install and Configure Zabbix Agent ou Agent2
-  become: yes
-  hosts: homelab
-  roles:
-  - zabbix-agent-custom
