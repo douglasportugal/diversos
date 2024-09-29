@@ -1,0 +1,106 @@
+---
+- name: Create users 
+  user:
+    name: "prometheus"
+    system: true
+    shell: /bin/false
+    state: present
+
+- name: Stop node_exporter.service before backup
+  systemd:
+    name: node_exporter.service
+    state: stopped
+  ignore_errors: True
+
+- name: Clean old install path
+  shell: rm -rf /opt/node_exporter; rm -rf /tmp/node_exporter; rm -f /etc/systemd/system/node_exporter.service; rm -f {{ node_exporter_service }}/node_exporter.service;rm -rf /usr/bin/node_exporter;
+  ignore_errors: True
+
+- name: Set fact linux package
+  set_fact: 
+    url_linux_node: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+
+- name: Download file on /tmp path
+  get_url:
+    url: "{{ url_linux_node }}"
+    dest: "/tmp"
+
+- name: Install packages
+  dnf:
+    name:
+     - tar
+    state: present
+    update_cache: true
+  when: ansible_distribution_file_variety == "RedHat" or ansible_distribution_file_variety == "OracleLinux" and ansible_distribution_file_variety == "AlmaLinux"
+
+- name: Extract file
+  shell: cd /tmp; tar -zxvf node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+
+- name: Create dir
+  file:
+    path: '{{ node_exporter_dir }}'
+    state: directory
+
+- name: Copy to bin
+  copy:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+    dest: "{{ node_exporter_dir }}/node_exporter"
+    remote_src: yes
+    owner: prometheus
+    group: prometheus
+
+- name: Copy simbolik link
+  file:
+    src: "{{ node_exporter_dir}}/node_exporter"
+    dest: "/usr/bin/node_exporter"
+    owner: prometheus
+    group: prometheus
+    state: link
+
+- name: Copy service file
+  copy:
+    src: "node_exporter.service"
+    dest: "{{ node_exporter_service }}"
+
+- name: Copy web-config file
+  copy:
+    src: "web.yml"
+    dest: "{{ node_exporter_dir }}"
+
+- name: Change node_exporter service
+  lineinfile:
+    state: present
+    dest: "{{ node_exporter_service }}/node_exporter.service"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - regexp: (# *)?web.config.file
+      line: "ExecStart=/usr/bin/node_exporter --web.config.file={{ node_exporter_dir }}/web.yml"
+
+- name: Systemctl reload
+  shell: systemctl daemon-reload
+
+- name: Permission on node_exporter directories
+  file:
+    path: "{{ node_exporter_dir}}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+    owner: prometheus
+    group: prometheus
+    force: yes
+
+- name: Restart node_exporter.service
+  systemd:
+    name: node_exporter.service
+    state: restarted
+
+- name: Insert a rule on line 1
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ node_exporter_port }}"
+    jump: ACCEPT
+    action: insert
+    comment: "node_exporter"
+    rule_num: 1

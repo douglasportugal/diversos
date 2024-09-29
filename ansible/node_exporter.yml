@@ -1,0 +1,6 @@
+---
+- name: Install and Configure node_exporter for prometheus
+  become: yes
+  hosts: homelab
+  roles:
+  - node_exporter

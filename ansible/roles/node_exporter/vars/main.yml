@@ -1,0 +1,5 @@
+---
+node_exporter_dir: "/opt/prometheus"
+node_exporter_version: "1.7.0"
+node_exporter_service: "/usr/lib/systemd/system/"
+node_exporter_port: "9100"
