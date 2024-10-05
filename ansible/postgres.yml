@@ -1,0 +1,6 @@
+---
+- name: Install and configure PostgreSQL 16 with TimescaleDB on Rocky Linux 9
+  hosts: zbxdb01
+  become: yes
+  roles:
+   - postgres

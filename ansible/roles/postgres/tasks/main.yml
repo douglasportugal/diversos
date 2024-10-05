@@ -1,0 +1,4 @@
+---
+- name: Rocky Linux 9
+  include_tasks: rocky9.yml
+  when: ansible_distribution == "Rocky" and ansible_distribution_major_version== "9"

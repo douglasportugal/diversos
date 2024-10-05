@@ -1,0 +1,4 @@
+---
+postgres_user: "zabbix"
+postgres_password: "tocomfome@10"
+postgres_db: "zabbix"

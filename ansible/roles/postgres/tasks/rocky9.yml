@@ -1,0 +1,101 @@
+- name: Install EPEL repository
+  dnf:
+    name: epel-release
+    state: present
+
+- name: Add the PostgreSQL GPG key
+  rpm_key:
+    state: present
+    key: https://download.postgresql.org/pub/repos/yum/keys/PGDG-RPM-GPG-KEY-RHEL
+
+- name: Install PostgreSQL repository
+  dnf:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+
+- name: Disable PostgreSQL module
+  command: dnf -qy module disable postgresql
+  become: true
+
+- name: Install Perl
+  dnf:
+    name: perl
+    state: present
+
+- name: Confirm installation of IPC::Run Perl module
+  command: perl -MIPC::Run -e 'print "IPC::Run is installed\n"'
+  register: ipc_run_check
+  ignore_errors: true
+
+- name: Show installation confirmation
+  debug:
+    msg: "{{ ipc_run_check.stdout }}"
+  when: ipc_run_check.rc == 0
+
+- name: Install dependencies for psycopg2
+  dnf:
+    name:
+      - python3-devel
+    state: present
+
+- name: Install psycopg2 using pip
+  pip:
+    name: psycopg2-binary
+    state: present
+
+- name: Install PostgreSQL 16
+  dnf:
+    name:
+      - postgresql16
+      - postgresql16-server
+    state: present
+
+- name: Initialize PostgreSQL database
+  command: /usr/pgsql-16/bin/initdb -D /var/lib/pgsql/16/data
+  args:
+    creates: /var/lib/pgsql/16/data/PG_VERSION
+  become: true
+  become_user: postgres
+
+- name: Enable and start PostgreSQL service
+  systemd:
+    name: postgresql-16
+    enabled: yes
+    state: started
+
+- name: Configure PostgreSQL to listen on all addresses
+  lineinfile:
+    path: /var/lib/pgsql/16/data/postgresql.conf
+    regexp: '^#?listen_addresses ='
+    line: "listen_addresses = '*'"
+    state: present
+  become: true
+
+- name: Remove restriction for 127.0.0.1 in pg_hba.conf
+  lineinfile:
+    path: /var/lib/pgsql/16/data/pg_hba.conf
+    regexp: '^host\s+all\s+all\s+127\.0\.0\.1/32\s+trust'
+    state: absent
+
+- name: Allow connections from the 192.168.0.0/24 network
+  lineinfile:
+    path: /var/lib/pgsql/16/data/pg_hba.conf
+    line: 'host    all             all             192.168.0.0/24         md5'
+    state: present
+
+- name: Restart PostgreSQL service after configuration changes
+  systemd:
+    name: postgresql-16
+    state: restarted
+
+- name: Create PostgreSQL user zabbix
+  postgresql_user:
+    name: zabbix
+    password: "{{ postgres_password }}"
+    state: present
+
+- name: Create PostgreSQL database zabbix
+  postgresql_db:
+    name: zabbix
+    owner: zabbix
+    state: present
