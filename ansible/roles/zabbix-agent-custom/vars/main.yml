@@ -11,5 +11,5 @@ agent_zabbix_port: "10055"
 agent_zabbix_servers: "0.0.0.0/0"
 agent_zabbix_servers_active: "0.0.0.0/0"
 zabbix_major_version: "7.0"
-zabbix_minor_version: "4"
+zabbix_minor_version: "5"
 backup_dir: /backup_zabbix

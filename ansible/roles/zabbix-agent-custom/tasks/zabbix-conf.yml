@@ -41,6 +41,19 @@
       - "{{ agent_zabbix_pid_dir }}"
       - "{{ agent_zabbix_log_dir }}"
 
+- name: Gerar PSK aleatória usando Jinja2
+  set_fact:
+    psk_aleatoria: "{{ lookup('password', '/dev/null length=64 chars=abcdef123456abcdef0123456789') }}"
+
+- name: Salvar PSK no arquivo de configuração do Zabbix Agent
+  copy:
+    content: "{{ psk_aleatoria }}"
+    dest: "{{ agent_zabbix_dir_confd }}zabbix_agent2_custom.psk"
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+  when: psk_aleatoria is defined
+
 - name: Copy archives
   ansible.builtin.copy:
     src: "{{ item.src }}"
@@ -48,7 +61,7 @@
     remote_src: "{{ item.remote_src | default('no') }}"
   loop:
     - { src: "{{ temp_dir }}/usr/sbin/zabbix_agent2", dst: "{{ agent_zabbix_dir }}/zabbix_agent2", remote_src: 'yes' }
-    - { src: "zabbix_agent2_custom.psk", dst: "{{ agent_zabbix_dir_confd }}" }
+    # - { src: "zabbix_agent2_custom.psk", dst: "{{ agent_zabbix_dir_confd }}" }
     - { src: "postgresql.conf", dst: "{{ agent_zabbix_dir_pluginsd }}" }
     - { src: "zabbix-agent2-plugin-postgresql", dst: "{{ agent_zabbix_dir_pluginsd }}" }
     - { src: "UserParameter_Cifs.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }

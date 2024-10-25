@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Zabbix Agent ou Agent2
   become: yes
-  hosts: homelab
+  hosts: g7 asus
   roles:
   - zabbix-agent-custom
