@@ -10,13 +10,10 @@
     ansible_zabbix_url_path: '/'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: 192.168.0.11
   delegate_to: g7
-  # community.zabbix.zabbix_api_info:
-  # register: zbx_api_info
   community.zabbix.zabbix_host:
     host_name: "{{ ansible_hostname }}"
     description: Ansible
-    host_groups: Linux servers
-    link_templates: Linux by Zabbix agent active
+    host_groups: homelab
     tls_psk_identity: "{{ ansible_hostname }}"
     tls_accept: 2 # Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).
     tls_connect: 2 # Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).

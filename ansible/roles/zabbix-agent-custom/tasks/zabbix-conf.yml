@@ -94,6 +94,5 @@
     state: restarted
     enabled: yes
 
-# Temporarily unusable for Zabbix 7 LTS; works fine in Zabbix 6.0 LTS. 
-# - name: Api
-#   include_tasks: api.yml
+- name: Api
+  include_tasks: api.yml
