@@ -61,7 +61,6 @@
     remote_src: "{{ item.remote_src | default('no') }}"
   loop:
     - { src: "{{ temp_dir }}/usr/sbin/zabbix_agent2", dst: "{{ agent_zabbix_dir }}/zabbix_agent2", remote_src: 'yes' }
-    # - { src: "zabbix_agent2_custom.psk", dst: "{{ agent_zabbix_dir_confd }}" }
     - { src: "postgresql.conf", dst: "{{ agent_zabbix_dir_pluginsd }}" }
     - { src: "zabbix-agent2-plugin-postgresql", dst: "{{ agent_zabbix_dir_pluginsd }}" }
     - { src: "UserParameter_Cifs.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
