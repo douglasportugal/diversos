@@ -65,6 +65,7 @@
     - { src: "zabbix-agent2-plugin-postgresql", dst: "{{ agent_zabbix_dir_pluginsd }}" }
     - { src: "UserParameter_Cifs.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
     - { src: "UserParameter_Mtr.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
+    - { src: "UserParameter_nvidia.conf", dst: "{{ agent_zabbix_dir_agent2d }}" }
     - { src: "check_cifs.sh", dst: "{{ agent_zabbix_dir_scripts }}" }
     - { src: "zabbix_agent2_custom.service", dst: "/usr/lib/systemd/system/" }
 

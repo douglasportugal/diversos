@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Zabbix Agent ou Agent2
   become: yes
-  hosts: g7 asus
+  hosts: g7
   roles:
   - zabbix-agent-custom
